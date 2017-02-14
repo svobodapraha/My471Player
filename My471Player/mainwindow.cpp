@@ -18,6 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << SampleListModel->lastError().text();
     ui->tableViewSampleList->setModel(SampleListModel);
 
+    playProcess = new QProcess(this);
+    connect(playProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
+            this, SLOT(on_playProcessExit(int,QProcess::ExitStatus)));
+
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +33,7 @@ void MainWindow::on_btnReadFile_clicked()
 {
     bool boResult;
     QString lineString;
-    QFile SampleListFile(QFileInfo(QCoreApplication::applicationDirPath()).filePath()+"/samples.txt");
+    QFile SampleListFile(QFileInfo(QCoreApplication::applicationDirPath()).filePath()+"/../samples/samples.txt");
     boResult = SampleListFile.open(QIODevice::ReadOnly);
     if(!boResult) qDebug() << "File not opened";
     SampleListStream = new QTextStream(SampleListFile.readAll());
@@ -84,16 +88,18 @@ void MainWindow::on_btnPlay_clicked()
      boResult = query.exec("select * from SAMPLES where SampleNo = "+QString::number(iSampleNo)+";");
 
      if(!boResult) qDebug() << "Problem to select samples";
-     //qDebug() << "col:" << query.record().count();
-     if (query.record().count() > 2)
-     if(1)
+     if(query.record().count() > 2)
      {
        while(query.next())
        {
          qDebug() << query.value(0).toInt();
          for (int i = 2; i < query.record().count(); ++i)
          {
-           if(!query.value(i).isNull())qDebug() << query.value(i).toString();
+           if(!query.value(i).isNull())
+           {
+             qDebug() << query.value(i).toString();
+             fnPlayFile(query.value(i).toString());
+           }
          }
        }
      }
@@ -103,4 +109,24 @@ void MainWindow::on_btnPlay_clicked()
      }
    }
 
+}
+
+int MainWindow::fnPlayFile(QString asFileToPlay)
+{
+  QString asTemp = QFileInfo(QCoreApplication::applicationDirPath()).filePath()+"/../samples/"+asFileToPlay+".mp3";
+  asFileToPlay = "\""+asTemp+"\"";
+  asFileToPlay = asTemp;
+
+  playProcess->setProcessChannelMode(QProcess::MergedChannels);
+  playProcess->start("mplayer", QStringList() << asFileToPlay);
+  qDebug() << asFileToPlay;
+  boPlayInProcess = true;
+  playProcess->waitForFinished(-1);
+  return 0;
+}
+
+void  MainWindow::on_playProcessExit(int exitCode, QProcess::ExitStatus exitStatus)
+{
+  boPlayInProcess = false;
+  qDebug() << "end" << exitCode << exitStatus;
 }
