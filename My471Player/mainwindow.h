@@ -10,6 +10,18 @@
 #include <QFileInfo>
 #include <QSqlRecord>
 #include <QProcess>
+#include <QList>
+
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <linux/can.h>
+#include <linux/can/raw.h>
+
+#include "waitforincommingframe.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +36,10 @@ public:
     ~MainWindow();
 
   int fnPlayFile(QString asFileToPlay);
+  void onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg);
+
+public slots:
+  void fnNewPlayRequest(int iInfo);
 
 private slots:
     void on_btnReadFile_clicked();
@@ -36,7 +52,13 @@ private:
     QTextStream    *SampleListStream;
     QProcess *playProcess;
     bool volatile boPlayInProcess;
+    QList<uint64_t> ListToPlay;
+
+signals:
+    void fnSignalNewPlayRequest(int iInfo);
 
 };
+
+extern MainWindow *pMainWindow;
 
 #endif // MAINWINDOW_H
