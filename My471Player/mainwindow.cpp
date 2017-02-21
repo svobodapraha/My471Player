@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //************************************
     //* Create thread for reading frames *
     //************************************
+    /*
     if ((pthread_create (&WaitForIncommingFrameId, NULL, &fnWaitForIncommingFrame, NULL)) == 0)
     {
        qDebug() << "Thread Created";
@@ -56,6 +57,25 @@ MainWindow::MainWindow(QWidget *parent) :
     {
       qDebug() << "Problem to Create Thread";
     }
+    */
+
+    //**************************************************
+    //* Create thread for reading frames using QThread *
+    //**************************************************
+    QThread *ReceiveCanFramesThread = new QThread;
+    ReceiveCanFrames_t *ReceiveCanFrames = new ReceiveCanFrames_t;
+    ReceiveCanFrames->moveToThread(ReceiveCanFramesThread);
+
+    connect(ReceiveCanFramesThread, SIGNAL(started()),            ReceiveCanFrames,       SLOT(doWork()));
+    connect(ReceiveCanFrames,       SIGNAL(signalWorkFinished()), ReceiveCanFramesThread, SLOT(quit()));
+
+    connect(ReceiveCanFramesThread, SIGNAL(finished()),           ReceiveCanFrames,       SLOT(deleteLater()));
+    connect(ReceiveCanFramesThread, SIGNAL(finished()),           ReceiveCanFramesThread, SLOT(deleteLater()));
+
+    //when frames is received:
+    //connect(ReceiveCanFrames, SIGNAL(signalCanMessageReceived(int)), this,                SLOT(onCanMessageReceivedFromQThread(int)));
+    ReceiveCanFramesThread->start();
+
     //*************************************
     //* set up database, models and views *
     //*************************************

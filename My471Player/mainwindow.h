@@ -11,6 +11,7 @@
 #include <QSqlRecord>
 #include <QProcess>
 #include <QList>
+#include <QThread>
 
 #include <stdio.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 #include <linux/can/raw.h>
 
 #include "waitforincommingframe.h"
+#include "receivecanframes.h"
 
 namespace Ui {
 class MainWindow;

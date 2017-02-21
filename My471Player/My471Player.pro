@@ -27,10 +27,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     dbmanager.cpp \
-    waitforincommingframe.cpp
+    waitforincommingframe.cpp \
+    receivecanframes.cpp
 
 HEADERS  += mainwindow.h \
     dbmanager.h \
-    waitforincommingframe.h
+    waitforincommingframe.h \
+    receivecanframes.h
 
 FORMS    += mainwindow.ui
