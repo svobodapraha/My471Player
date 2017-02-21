@@ -35,7 +35,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-  int fnPlayFile(QString asFileToPlay);
+  int fnPlayFile(QStringList &asFileListToPlay);
   void onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg);
 
 public slots:

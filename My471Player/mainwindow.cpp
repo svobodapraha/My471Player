@@ -143,10 +143,13 @@ void MainWindow::on_btnPlay_clicked()
 {
    int iSampleNo = -1;
    QSqlQuery query;
+   QStringList asFileListToPlay;
    bool boResult = false;
    iSampleNo = ui->plainTextEdit_SampleNo->toPlainText().toInt(&boResult);
    if(!boResult) iSampleNo = -1;
    qDebug() << iSampleNo;
+
+   asFileListToPlay.clear();
    if(iSampleNo >= 0)
    {
      boResult = query.exec("select * from SAMPLES where SampleNo = "+QString::number(iSampleNo)+";");
@@ -161,10 +164,18 @@ void MainWindow::on_btnPlay_clicked()
          {
            if(!query.value(i).isNull())
            {
-             qDebug() << query.value(i).toString();
-             fnPlayFile(query.value(i).toString());
+             QString asFileToPlay;
+             asFileToPlay = (query.value(i).toString());
+             qDebug() << asFileToPlay;
+             asFileToPlay = QFileInfo(QCoreApplication::applicationDirPath()).filePath()+"/../samples/"+asFileToPlay+".mp3";
+             //asFileToPlay = "\""+asFileToPlay+"\"";
+             asFileListToPlay << asFileToPlay;
            }
          }
+       }
+       if(!asFileListToPlay.isEmpty())
+       {
+         fnPlayFile(asFileListToPlay);
        }
      }
      else
@@ -175,15 +186,19 @@ void MainWindow::on_btnPlay_clicked()
 
 }
 
-int MainWindow::fnPlayFile(QString asFileToPlay)
+int MainWindow::fnPlayFile(QStringList &asFileListToPlay)
 {
-  QString asTemp = QFileInfo(QCoreApplication::applicationDirPath()).filePath()+"/../samples/"+asFileToPlay+".mp3";
-  asFileToPlay = "\""+asTemp+"\"";
-  asFileToPlay = asTemp;
 
-  playProcess->setProcessChannelMode(QProcess::MergedChannels);
-  playProcess->start("mplayer", QStringList() << asFileToPlay);
-  qDebug() << asFileToPlay;
+  QStringList asPlayerSwitches;
+  asPlayerSwitches.clear();
+
+  playProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+  playProcess->start("mplayer", asPlayerSwitches + asFileListToPlay);
+  qDebug() << "Player Started";
+  foreach (QString asItem, asFileListToPlay)
+  {
+    qDebug() << asItem;
+  }
   boPlayInProcess = true;
   playProcess->waitForFinished(-1);
   return 0;
