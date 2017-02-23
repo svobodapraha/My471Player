@@ -3,6 +3,7 @@
 
 //can socket and thread global variables
 pthread_t WaitForIncommingFrameId = -1;
+QList<int> ListSamplesToPlayFromCAN;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,6 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ListSamplesToPlayFromCAN.clear();
+
+
+
     //******************************
     //* create and open can socket *
     //******************************
@@ -257,5 +262,13 @@ void MainWindow::fnNewPlayRequest(int iInfo)
     foreach (int iSampleNo, ListToPlay)
     {
        qDebug() << "in list:" << iSampleNo;
+    }
+}
+
+void MainWindow::on_btnList_clicked()
+{
+    foreach (int iSampleNo, ListSamplesToPlayFromCAN)
+    {
+       qDebug() << iSampleNo;
     }
 }

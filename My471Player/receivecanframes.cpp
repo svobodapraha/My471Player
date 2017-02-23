@@ -34,6 +34,19 @@ void ReceiveCanFrames_t::doWork()
          memcpy(ReceivedCanMsg.can_data, frame_rd.data, u8SizeToCopy);
 
         qDebug() << "MsgInThread received: "<< ReceivedCanMsg.can_identifier << iMessageCounter;
+        //Filter message for dhs
+        if(ReceivedCanMsg.can_identifier == TO_DHS_Id)
+        {
+           uint16_t u16DhsCmd = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+0));
+           if(u16DhsCmd == DHS_CMD_SAMPLE)
+           {
+             uint16_t u16DhsSampleNo = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+4));
+             qDebug() << "PLAY SAMPLE " << u16DhsSampleNo;
+             ListSamplesToPlayFromCAN << u16DhsSampleNo;
+           }
+
+        }
+
       }
   }
 }

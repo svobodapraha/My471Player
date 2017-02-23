@@ -24,13 +24,13 @@
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>411</y>
-      <width>244</width>
-      <height>31</height>
+      <width>331</width>
+      <height>72</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -48,6 +48,13 @@
       <widget class="QPushButton" name="btnPlay">
        <property name="text">
         <string>PLAY</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnList">
+       <property name="text">
+        <string>LIST</string>
        </property>
       </widget>
      </item>

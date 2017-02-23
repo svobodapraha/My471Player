@@ -48,6 +48,8 @@ private slots:
     void on_btnPlay_clicked();
     void on_playProcessExit(int exitCode, QProcess::ExitStatus exitStatus);
 
+    void on_btnList_clicked();
+
 private:
     Ui::MainWindow *ui;
     QSqlTableModel *SampleListModel;
@@ -62,5 +64,7 @@ signals:
 };
 
 extern MainWindow *pMainWindow;
+extern QList<int> ListSamplesToPlayFromCAN;
+
 
 #endif // MAINWINDOW_H
