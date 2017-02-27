@@ -42,7 +42,9 @@ void ReceiveCanFrames_t::doWork()
            {
              uint16_t u16DhsSampleNo = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+4));
              qDebug() << "PLAY SAMPLE " << u16DhsSampleNo;
+             MutexListSample.lock();
              ListSamplesToPlayFromCAN << u16DhsSampleNo;
+             MutexListSample.unlock();
            }
 
         }

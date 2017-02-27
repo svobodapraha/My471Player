@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QList>
 #include <QThread>
+#include <QMutex>
 
 #include <stdio.h>
 #include <string.h>
@@ -45,10 +46,14 @@ public slots:
 
 private slots:
     void on_btnReadFile_clicked();
-    void on_btnPlay_clicked();
+    void fnPlayFromCanFIFOList();
     void on_playProcessExit(int exitCode, QProcess::ExitStatus exitStatus);
 
     void on_btnList_clicked();
+
+    void on_btnPlay_clicked();
+
+    void on_btnPlayFromFifo_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -65,6 +70,7 @@ signals:
 
 extern MainWindow *pMainWindow;
 extern QList<int> ListSamplesToPlayFromCAN;
+extern QMutex MutexListSample;
 
 
 #endif // MAINWINDOW_H

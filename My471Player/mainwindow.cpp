@@ -4,6 +4,7 @@
 //can socket and thread global variables
 pthread_t WaitForIncommingFrameId = -1;
 QList<int> ListSamplesToPlayFromCAN;
+QMutex MutexListSample;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -164,15 +165,30 @@ void MainWindow::on_btnReadFile_clicked()
 
 }
 
-void MainWindow::on_btnPlay_clicked()
+void MainWindow::fnPlayFromCanFIFOList()
 {
    int iSampleNo = -1;
+   bool boResult;
    QSqlQuery query;
    QStringList asFileListToPlay;
-   bool boResult = false;
-   iSampleNo = ui->plainTextEdit_SampleNo->toPlainText().toInt(&boResult);
-   if(!boResult) iSampleNo = -1;
-   qDebug() << iSampleNo;
+
+   //Check FIFO in ListSamplesToPlayFromCAN
+   MutexListSample.lock();
+   if (!ListSamplesToPlayFromCAN.isEmpty())
+   {
+     iSampleNo = ListSamplesToPlayFromCAN.at(0);
+     ListSamplesToPlayFromCAN.removeAt(0);
+     MutexListSample.unlock();
+     qDebug() << "Sample from FIFO: "<< iSampleNo;
+   }
+   else
+   {
+     iSampleNo = -1;
+     MutexListSample.unlock();
+     return;
+   }
+
+
 
    asFileListToPlay.clear();
    if(iSampleNo >= 0)
@@ -233,6 +249,7 @@ void  MainWindow::on_playProcessExit(int exitCode, QProcess::ExitStatus exitStat
 {
   boPlayInProcess = false;
   qDebug() << "end" << exitCode << exitStatus;
+  emit fnSignalNewPlayRequest(1);
 }
 
 
@@ -258,17 +275,37 @@ void MainWindow::onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg
 
 void MainWindow::fnNewPlayRequest(int iInfo)
 {
-    iInfo = iInfo;
-    foreach (int iSampleNo, ListToPlay)
-    {
-       qDebug() << "in list:" << iSampleNo;
-    }
+   fnPlayFromCanFIFOList();
 }
 
 void MainWindow::on_btnList_clicked()
 {
+    MutexListSample.lock();
     foreach (int iSampleNo, ListSamplesToPlayFromCAN)
     {
        qDebug() << iSampleNo;
     }
+    MutexListSample.unlock();
+}
+
+void MainWindow::on_btnPlay_clicked()
+{
+    int iSampleNo = -1;
+    bool boResult;
+    iSampleNo = ui->plainTextEdit_SampleNo->toPlainText().toInt(&boResult);
+    if(!boResult) iSampleNo = -1;
+    qDebug() << iSampleNo;
+    if (iSampleNo >= 0)
+    {
+      MutexListSample.lock();
+      ListSamplesToPlayFromCAN << iSampleNo;
+      MutexListSample.unlock();
+    }
+
+
+}
+
+void MainWindow::on_btnPlayFromFifo_clicked()
+{
+   fnPlayFromCanFIFOList();
 }

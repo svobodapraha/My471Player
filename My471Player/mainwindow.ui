@@ -29,7 +29,7 @@
      <rect>
       <x>20</x>
       <y>411</y>
-      <width>331</width>
+      <width>441</width>
       <height>72</height>
      </rect>
     </property>
@@ -47,7 +47,7 @@
      <item>
       <widget class="QPushButton" name="btnPlay">
        <property name="text">
-        <string>PLAY</string>
+        <string>QUEUE</string>
        </property>
       </widget>
      </item>
@@ -55,6 +55,13 @@
       <widget class="QPushButton" name="btnList">
        <property name="text">
         <string>LIST</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPlayFromFifo">
+       <property name="text">
+        <string>PLAY FROM FIFO</string>
        </property>
       </widget>
      </item>
