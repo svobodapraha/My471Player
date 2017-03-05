@@ -110,9 +110,12 @@ MainWindow::MainWindow(QWidget *parent) :
     boPlayInProcess = false;
 
     connect(this, SIGNAL(fnSignalNewPlayRequest(int)),
-            this, SLOT  (fnNewPlayRequest(int)));
+            this, SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
 
-
+    //*************************
+    //* Read samples def file *
+    //*************************
+    fnReadSamplesDefFile();
 }
 
 MainWindow::~MainWindow()
@@ -120,7 +123,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_btnReadFile_clicked()
+void MainWindow::fnReadSamplesDefFile()
 {
     bool boResult;
     QString lineString;
@@ -166,8 +169,14 @@ void MainWindow::on_btnReadFile_clicked()
 
 }
 
-void MainWindow::fnPlayFromCanFIFOList()
+
+
+
+
+
+void MainWindow::fnPlayFromCanFIFOList(int iInfo)
 {
+   iInfo = iInfo;
    int iSampleNo = -1;
    bool boResult;
    QSqlQuery query;
@@ -236,10 +245,16 @@ void MainWindow::fnPlayFromCanFIFOList()
        {
          fnPlayFile(asFileListToPlay);
        }
+       else
+       {
+         emit fnSignalNewPlayRequest(4);
+         qDebug() << "No samples files assigned";
+       }
      }
      else
      {
-
+        emit fnSignalNewPlayRequest(3);
+        qDebug() << "SampleNo not valid - negative";
      }
    }
 
@@ -272,46 +287,19 @@ void  MainWindow::on_playProcessExit(int exitCode, QProcess::ExitStatus exitStat
 }
 
 
-void MainWindow::onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg)
-{
-    static uint64_t u64LastValue = 0;
-    uint64_t u64CurrentValue = 0;
-    u64CurrentValue = *((uint64_t *)ReceivedCanMsg->can_data);
-    qDebug() << "MessageCounter:"
-             << iCounter
-             << ReceivedCanMsg->can_identifier
-             << ReceivedCanMsg->can_data_length
-             << QByteArray((const char *)ReceivedCanMsg->can_data, ReceivedCanMsg->can_data_length).toHex()
-             << "Diff:"
-             << (u64CurrentValue-u64LastValue);
-    u64LastValue = u64CurrentValue;
 
-    //add to list...
-    ListToPlay.append(u64CurrentValue);
-    emit fnSignalNewPlayRequest(1);
 
-}
 
-void MainWindow::fnNewPlayRequest(int iInfo)
-{
-   fnPlayFromCanFIFOList();
-}
 
-void MainWindow::on_btnPlayFromFifo_clicked()
-{
-   fnPlayFromCanFIFOList();
-}
 
-void MainWindow::on_btnList_clicked()
-{
-    MutexListSample.lock();
-    foreach (int iSampleNo, ListSamplesToPlayFromCAN)
-    {
-       qDebug() << iSampleNo;
-    }
-    MutexListSample.unlock();
-}
 
+
+
+//****************
+//* GUI SLOTS    *
+//****************
+
+//Queue from user interface
 void MainWindow::on_btnPlay_clicked()
 {
     int iSampleNo = -1;
@@ -326,7 +314,45 @@ void MainWindow::on_btnPlay_clicked()
       MutexListSample.unlock();
     }
 
-
 }
+
+//check what is in list
+void MainWindow::on_btnList_clicked()
+{
+    MutexListSample.lock();
+    foreach (int iSampleNo, ListSamplesToPlayFromCAN)
+    {
+       qDebug() <<"In List: "<< iSampleNo;
+    }
+    MutexListSample.unlock();
+}
+
+//request to play
+void MainWindow::on_btnPlayFromFifo_clicked()
+{
+    emit fnSignalNewPlayRequest(1);
+}
+
+
+//****************
+//* NOT USED NOW *
+//****************
+//this method is called from thread created by pthread_create
+//now we are using QThread
+void MainWindow::onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg)
+{
+    static uint64_t u64LastValue = 0;
+    uint64_t u64CurrentValue = 0;
+    u64CurrentValue = *((uint64_t *)ReceivedCanMsg->can_data);
+    qDebug() << "MessageCounter:"
+             << iCounter
+             << ReceivedCanMsg->can_identifier
+             << ReceivedCanMsg->can_data_length
+             << QByteArray((const char *)ReceivedCanMsg->can_data, ReceivedCanMsg->can_data_length).toHex()
+             << "Diff:"
+             << (u64CurrentValue-u64LastValue);
+    u64LastValue = u64CurrentValue;
+}
+
 
 

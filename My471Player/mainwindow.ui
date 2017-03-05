@@ -35,13 +35,6 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="btnReadFile">
-       <property name="text">
-        <string>READ FILE</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPlainTextEdit" name="plainTextEdit_SampleNo"/>
      </item>
      <item>

@@ -42,11 +42,11 @@ public:
   void onCanMessageReceived(int iCounter, XMC_LMOCan_t *ReceivedCanMsg);
 
 public slots:
-  void fnNewPlayRequest(int iInfo);
+
 
 private slots:
-    void on_btnReadFile_clicked();
-    void fnPlayFromCanFIFOList();
+    void fnReadSamplesDefFile();
+    void fnPlayFromCanFIFOList(int iInfo);
     void on_playProcessExit(int exitCode, QProcess::ExitStatus exitStatus);
 
     void on_btnList_clicked();
@@ -61,7 +61,6 @@ private:
     QTextStream    *SampleListStream;
     QProcess *playProcess;
     bool volatile boPlayInProcess;
-    QList<uint64_t> ListToPlay;
 
 signals:
     void fnSignalNewPlayRequest(int iInfo);
