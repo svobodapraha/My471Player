@@ -107,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     playProcess = new QProcess(this);
     connect(playProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
             this, SLOT(on_playProcessExit(int,QProcess::ExitStatus)));
+    boPlayInProcess = false;
 
     connect(this, SIGNAL(fnSignalNewPlayRequest(int)),
             this, SLOT  (fnNewPlayRequest(int)));
@@ -172,7 +173,24 @@ void MainWindow::fnPlayFromCanFIFOList()
    QSqlQuery query;
    QStringList asFileListToPlay;
 
+   //if Play is in process, wait for end.
+//   if(boPlayInProcess)
+//   {
+//       qDebug() << "Play in process, waiting for end";
+//       return;
+//   }
+
+   if (playProcess->state() != QProcess::NotRunning)
+   {
+       qDebug() << "Play in process, waiting for end " << playProcess->state();
+       return;
+   }
+
+
+
+
    //Check FIFO in ListSamplesToPlayFromCAN
+   //There is a only samples number - sample or samples files to play is necessary to look up in database
    MutexListSample.lock();
    if (!ListSamplesToPlayFromCAN.isEmpty())
    {
@@ -189,7 +207,7 @@ void MainWindow::fnPlayFromCanFIFOList()
    }
 
 
-
+   //loop up sampe/s file in database
    asFileListToPlay.clear();
    if(iSampleNo >= 0)
    {
@@ -233,7 +251,7 @@ int MainWindow::fnPlayFile(QStringList &asFileListToPlay)
   QStringList asPlayerSwitches;
   asPlayerSwitches.clear();
 
-  playProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+  //playProcess->setProcessChannelMode(QProcess::ForwardedChannels);
   playProcess->start("mplayer", asPlayerSwitches + asFileListToPlay);
   qDebug() << "Player Started";
   foreach (QString asItem, asFileListToPlay)
@@ -241,10 +259,11 @@ int MainWindow::fnPlayFile(QStringList &asFileListToPlay)
     qDebug() << asItem;
   }
   boPlayInProcess = true;
-  playProcess->waitForFinished(-1);
+  //playProcess->waitForFinished(-1);
   return 0;
 }
 
+//External process - player finished playing last sample
 void  MainWindow::on_playProcessExit(int exitCode, QProcess::ExitStatus exitStatus)
 {
   boPlayInProcess = false;
@@ -278,6 +297,11 @@ void MainWindow::fnNewPlayRequest(int iInfo)
    fnPlayFromCanFIFOList();
 }
 
+void MainWindow::on_btnPlayFromFifo_clicked()
+{
+   fnPlayFromCanFIFOList();
+}
+
 void MainWindow::on_btnList_clicked()
 {
     MutexListSample.lock();
@@ -305,7 +329,4 @@ void MainWindow::on_btnPlay_clicked()
 
 }
 
-void MainWindow::on_btnPlayFromFifo_clicked()
-{
-   fnPlayFromCanFIFOList();
-}
+
