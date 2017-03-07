@@ -109,8 +109,12 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_playProcessExit(int,QProcess::ExitStatus)));
     boPlayInProcess = false;
 
-    connect(this, SIGNAL(fnSignalNewPlayRequest(int)),
-            this, SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
+    connect(this,             SIGNAL(fnSignalNewPlayRequest(int)),
+            this,             SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
+
+    connect(ReceiveCanFrames, SIGNAL(fnSignalNewPlayRequestWhenCanRcv(int)),
+            this,             SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
+
 
     //*************************
     //* Read samples def file *

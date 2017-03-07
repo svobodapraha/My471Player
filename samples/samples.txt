@@ -1,9 +1,9 @@
-12 zastavka
-15 stanice
-22 mustek muzeum
-85 vystupovat mezera praha
-91 konecna
-15 sporilov
-151 zdase
-236 rozlobim
-78 zdase rozlobim
+1 1 a b
+2 2 c d
+3 3 e f g h
+4 4 i j k l m
+5 5 o p t
+6 6 negative
+7 7 point
+8 8 million point negative
+9 9 thousand u v w x

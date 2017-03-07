@@ -16,6 +16,8 @@
 #include <QDebug>
 #include "waitforincommingframe.h"
 
+#define MAX_SAMPLES_IN_CAN_FIFO 20
+
 class ReceiveCanFrames_t : public QObject
 {
     Q_OBJECT
@@ -26,6 +28,7 @@ public:
 signals:
     void signalWorkFinished();
     void signalCanMessageReceived(int iMessageCounter);
+    void fnSignalNewPlayRequestWhenCanRcv(int iInfo);
 public slots:
     void doWork();
 };

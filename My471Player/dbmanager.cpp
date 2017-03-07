@@ -18,8 +18,9 @@ DbManager::DbManager()
 
     if(!boResult) qDebug() << "problem to create table SAMPLES";
 
-    boResult = query.exec("insert into SAMPLES values(1, 1)");
-    if(!boResult) qDebug() << "problem to insert values SAMPLES";
+//    insert test
+//    boResult = query.exec("insert into SAMPLES values(1, 1)");
+//    if(!boResult) qDebug() << "problem to insert values SAMPLES";
 
   }
   else

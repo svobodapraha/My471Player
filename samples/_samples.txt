@@ -1,0 +1,9 @@
+12 zastavka
+15 stanice
+22 mustek muzeum
+85 vystupovat mezera praha
+91 konecna
+15 sporilov
+151 zdase
+236 rozlobim
+78 zdase rozlobim
