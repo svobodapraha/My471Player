@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //find index for selected device
     struct ifreq ifr;
-#define USED_CAN_DEVICE "vcan0"
-//#define USED_CAN_DEVICE "can0"
+//#define USED_CAN_DEVICE "vcan0"
+#define USED_CAN_DEVICE "can0"
     strcpy(ifr.ifr_name, USED_CAN_DEVICE);  //virtual can
     //strcpy(ifr.ifr_name, "can0");   //real can
     if (ioctl(iCanSocId, SIOCGIFINDEX, &ifr) < 0)
@@ -271,7 +271,16 @@ int MainWindow::fnPlayFile(QStringList &asFileListToPlay)
   asPlayerSwitches.clear();
 
   //playProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+
+#define hwRPI
+#ifdef hwRPI
+  asPlayerSwitches << "-o" << "local";
+  playProcess->start("omxplayer", asPlayerSwitches + asFileListToPlay);
+#else
+  asPlayerSwitches.clear();
   playProcess->start("mplayer", asPlayerSwitches + asFileListToPlay);
+#endif
+
   qDebug() << "Player Started";
   foreach (QString asItem, asFileListToPlay)
   {

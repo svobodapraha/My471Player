@@ -40,7 +40,7 @@ void ReceiveCanFrames_t::doWork()
            uint16_t u16DhsCmd = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+0));
            if(u16DhsCmd == DHS_CMD_SAMPLE)
            {
-             uint16_t u16DhsSampleNo = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+4));
+             uint16_t u16DhsSampleNo = *((uint16_t*)(((char*)(&ReceivedCanMsg.can_data))+5));
              qDebug() << "PLAY SAMPLE " << u16DhsSampleNo;
              MutexListSample.lock();
              if (ListSamplesToPlayFromCAN.count() < MAX_SAMPLES_IN_CAN_FIFO)
