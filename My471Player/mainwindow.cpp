@@ -104,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //* set processes and other connections *
     //***************************************
 
+    //backraound play
     playProcess = new QProcess(this);
     connect(playProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
             this, SLOT(on_playProcessExit(int,QProcess::ExitStatus)));
@@ -112,8 +113,29 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,             SIGNAL(fnSignalNewPlayRequest(int)),
             this,             SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
 
+
+    //setting proces
+    setProcess = new QProcess(this);
+    setProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+
+
+    //when frame received
     connect(ReceiveCanFrames, SIGNAL(fnSignalNewPlayRequestWhenCanRcv(int)),
             this,             SLOT  (fnPlayFromCanFIFOList(int)), Qt::QueuedConnection);
+
+
+
+
+    //**********************
+    //* Set Audio Channels  *
+    //***********************
+     #define hwRPI
+     #ifdef hwRPI
+       setProcess->start("amixer cset numid=3 1");
+       setProcess->waitForFinished(-1);
+     #else
+       //other hw
+     #endif
 
 
     //*************************
@@ -193,8 +215,10 @@ void MainWindow::fnPlayFromCanFIFOList(int iInfo)
 //       return;
 //   }
 
+
    if (playProcess->state() != QProcess::NotRunning)
    {
+       //New play sample set will be played as soon as current set ends - exit from playProcess
        qDebug() << "Play in process, waiting for end " << playProcess->state();
        return;
    }
@@ -272,14 +296,10 @@ int MainWindow::fnPlayFile(QStringList &asFileListToPlay)
 
   //playProcess->setProcessChannelMode(QProcess::ForwardedChannels);
 
-#define hwRPI
-#ifdef hwRPI
-  asPlayerSwitches << "-o" << "local";
-  playProcess->start("omxplayer", asPlayerSwitches + asFileListToPlay);
-#else
+
   asPlayerSwitches.clear();
   playProcess->start("mplayer", asPlayerSwitches + asFileListToPlay);
-#endif
+
 
   qDebug() << "Player Started";
   foreach (QString asItem, asFileListToPlay)

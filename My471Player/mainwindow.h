@@ -60,6 +60,7 @@ private:
     QSqlTableModel *SampleListModel;
     QTextStream    *SampleListStream;
     QProcess *playProcess;
+    QProcess *setProcess;
     bool volatile boPlayInProcess;
 
 signals:
